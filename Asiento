@@ -1,0 +1,25 @@
+public class Asiento {
+    private int numero;
+    private boolean ocupado;
+    private String nombrePasajero;
+    private String idPasajero;
+    private boolean esVentana;
+
+    public Asiento(int numero, boolean esVentana) {
+        this.numero = numero;
+        this.esVentana = esVentana;
+        this.ocupado = false;
+        this.nombrePasajero = "";
+        this.idPasajero = "";
+    }
+
+    // Getters y Setters
+    public int getNumero() { return numero; }
+    public boolean isOcupado() { return ocupado; }
+    public void setOcupado(boolean ocupado) { this.ocupado = ocupado; }
+    public String getNombrePasajero() { return nombrePasajero; }
+    public void setNombrePasajero(String nombrePasajero) { this.nombrePasajero = nombrePasajero; }
+    public String getIdPasajero() { return idPasajero; }
+    public void setIdPasajero(String idPasajero) { this.idPasajero = idPasajero; }
+    public boolean esVentana() { return esVentana; }
+}
