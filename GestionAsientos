@@ -1,0 +1,141 @@
+import java.io.*;
+import java.util.Scanner;
+
+public class GestionAsientos {
+    private static final int CANTIDAD_ASIENTOS = 20;
+    private Asiento[] asientos;
+    private static final String ARCHIVO_DATOS = "asientos.dat";
+
+    public GestionAsientos() {
+        asientos = new Asiento[CANTIDAD_ASIENTOS];
+        inicializarAsientos();
+        cargarDatos();
+    }
+
+    private void inicializarAsientos() {
+        // Asientos 1-10: Ventana, 11-20: Pasillo
+        for (int i = 0; i < CANTIDAD_ASIENTOS; i++) {
+            asientos[i] = new Asiento(i + 1, i < 10);
+        }
+    }
+
+    private void cargarDatos() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(ARCHIVO_DATOS))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                String[] datos = linea.split(",");
+                if (datos.length == 5) {
+                    int num = Integer.parseInt(datos[0]);
+                    if (num >= 1 && num <= CANTIDAD_ASIENTOS) {
+                        Asiento a = asientos[num - 1];
+                        a.setOcupado(Boolean.parseBoolean(datos[1]));
+                        a.setNombrePasajero(datos[2]);
+                        a.setIdPasajero(datos[3]);
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Archivo no encontrado. Iniciando con asientos nuevos.");
+        } catch (IOException e) {
+            System.out.println("Error al cargar datos: " + e.getMessage());
+        }
+    }
+
+    private void guardarDatos() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARCHIVO_DATOS))) {
+            for (Asiento a : asientos) {
+                writer.write(a.getNumero() + "," +
+                             a.isOcupado() + "," +
+                             a.getNombrePasajero() + "," +
+                             a.getIdPasajero() + "," +
+                             a.esVentana());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Error al guardar datos: " + e.getMessage());
+        }
+    }
+
+    public void mostrarMenu() {
+        Scanner scanner = new Scanner(System.in);
+        int opcion;
+
+        do {
+            System.out.println("\n--- CONTROL DE ASIENTOS DEL BUS ---");
+            System.out.println("1. Asignar asiento");
+            System.out.println("2. Consultar estado de un asiento");
+            System.out.println("3. Salir y guardar");
+            System.out.print("Seleccione una opción: ");
+            opcion = scanner.nextInt();
+            scanner.nextLine(); // Limpiar buffer
+
+            switch (opcion) {
+                case 1:
+                    asignarAsiento(scanner);
+                    break;
+                case 2:
+                    consultarEstado(scanner);
+                    break;
+                case 3:
+                    guardarDatos();
+                    System.out.println("¡Datos guardados exitosamente!");
+                    break;
+                default:
+                    System.out.println("Opción inválida. Intente de nuevo.");
+            }
+        } while (opcion != 3);
+    }
+
+    private void asignarAsiento(Scanner scanner) {
+        System.out.print("Número de asiento (1-20): ");
+        int num = scanner.nextInt();
+        scanner.nextLine();
+
+        if (num < 1 || num > CANTIDAD_ASIENTOS) {
+            System.out.println("Número inválido. Debe ser entre 1-20.");
+            return;
+        }
+
+        Asiento a = asientos[num - 1];
+        if (a.isOcupado()) {
+            System.out.println("El asiento está ocupado.");
+        } else {
+            System.out.print("Nombre del pasajero: ");
+            String nombre = scanner.nextLine();
+            System.out.print("ID del pasajero: ");
+            String id = scanner.nextLine();
+            
+            a.setOcupado(true);
+            a.setNombrePasajero(nombre);
+            a.setIdPasajero(id);
+            System.out.println("Asiento asignado correctamente.");
+        }
+    }
+
+    private void consultarEstado(Scanner scanner) {
+        System.out.print("Número de asiento (1-20): ");
+        int num = scanner.nextInt();
+        scanner.nextLine();
+
+        if (num < 1 || num > CANTIDAD_ASIENTOS) {
+            System.out.println("Número inválido. Debe ser entre 1-20.");
+            return;
+        }
+
+        Asiento a = asientos[num - 1];
+        System.out.println("\n--- ESTADO DEL ASIENTO " + num + " ---");
+        System.out.println("Estado: " + (a.isOcupado() ? "Ocupado" : "Disponible"));
+        
+        if (a.isOcupado()) {
+            System.out.println("Pasajero: " + a.getNombrePasajero());
+            System.out.println("ID: " + a.getIdPasajero());
+        }
+        
+        System.out.println("Tipo: " + (a.esVentana() ? "Ventana" : "Pasillo"));
+    }
+
+    public static void main(String[] args) {
+        GestionAsientos gestion = new GestionAsientos();
+        gestion.mostrarMenu();
+    }
+}
